@@ -6,8 +6,7 @@ import {
   emailVerificationMailgenContent,
   forgotPasswordMailgenContent,
   sendEmail,
-} from "../utils/mail.js";
-
+} from '../utils/mail.js';
 
 const generateAccessAndRefreshTokens = async (userId) => {
   try {
@@ -21,7 +20,7 @@ const generateAccessAndRefreshTokens = async (userId) => {
   } catch (error) {
     throw new ApiError(
       500,
-      "Something went wrong while generating access token",
+      'Something went wrong while generating access token'
     );
   }
 };
@@ -43,4 +42,37 @@ const registerUser = asyncHandler(async (req, res) => {
   });
   const { unHashedToken, hashedToken, tokenExpiry } =
     user.generateTemporaryToken();
+
+  user.emailVerificationToken = hashedToken;
+  user.emailVerificationExpiry = tokenExpiry;
+
+  await user.save({ validateBeforeSave: false });
+
+  await sendEmail({
+    email: user?.email,
+    subject: 'Please verify your email',
+    mailgenContent: emailVerificationMailgenContent(
+      user.username,
+      `${req.protocol}://${req.get('host')}/api/v1/users/verify-email/${unHashedToken}`
+    ),
+  });
+
+  const createdUser = await User.findById(user._id).select(
+    '-password -refreshToken -emailVerificationToken -emailVerificationExpiry'
+  );
+
+  if (!createdUser) {
+    throw new ApiError(500, 'Something went wrong while registering a user');
+  }
+
+  return res
+    .status(201)
+    .json(
+      new ApiResponse(
+        200,
+        { user: createdUser },
+        'User registered successfully and verification email has been sent on your email'
+      )
+    );
 });
+export {registerUser}

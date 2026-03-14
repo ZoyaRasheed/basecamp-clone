@@ -2,12 +2,13 @@ import express from 'express'
 import 'dotenv/config'
 import cors from 'cors'
 import healthCheckRouter from "./routes/healthcheck.routes.js"
+import authRouter from "./routes/auth.routes.js"
 
 
 //app.js is entirely for express configuration and index.js would be the entry point of application
 const app = express()
 
-// Basic configuration
+// Basic configurations
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 app.use(express.static("public"))// this is public viewable
@@ -23,6 +24,7 @@ app.use(cors({
 
 
  app.use("/api/v1/healthcheck/", healthCheckRouter)
+ app.use("/api/v1/auth/",authRouter)
 
 
-export default app
+export default app;

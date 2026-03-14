@@ -1,6 +1,7 @@
 import Mailgen from 'mailgen';
+import 'dotenv/config';
 //Mailgen: Node.js package that generates clean, responsive HTML e-mails for sending transactional mail.
-
+import nodemailer from 'nodemailer';
 const sendEmail = async (options) => {
   const mailGenerator = new Mailgen({
     //this has nothing to do with sending mail, its just Mailgen package default branding
@@ -13,17 +14,18 @@ const sendEmail = async (options) => {
   const emailTextual = mailGenerator.generatePlaintext(options.mailgenContent);
 
   const emailHtml = mailGenerator.generate(options.mailgenContent);
-
+ 
   const transporter = nodemailer.createTransport({
     host: process.env.MAILTRAP_SMTP_HOST,
     port: process.env.MAILTRAP_SMTP_PORT,
+    secure: false,
     auth: {
       user: process.env.MAILTRAP_SMTP_USER,
       pass: process.env.MAILTRAP_SMTP_PASS,
     },
   });
-   const mail = {
-    from: "mail.taskmanager@example.com",
+  const mail = {
+    from: 'mail.taskmanager@example.com',
     to: options.email,
     subject: options.subject,
     text: emailTextual,
@@ -36,7 +38,7 @@ const sendEmail = async (options) => {
     // console.error(
     //   "Email service failed siliently. Make sure that you have provided your MAILTRAP credentials in the .env file",
     // );
-    console.error("Error: ", error);
+    console.error('Error: ', error);
   }
 };
 
@@ -79,4 +81,8 @@ const forgotPasswordMailgenContent = (username, passwordResetUrl) => {
   };
 };
 
-export { emailVerificationMailgenContent, forgotPasswordMailgenContent, sendEmail };
+export {
+  emailVerificationMailgenContent,
+  forgotPasswordMailgenContent,
+  sendEmail,
+};

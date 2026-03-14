@@ -61,10 +61,10 @@ const usersSchema = new Schema(
 
 // pre hooks , just befoe saving the schema you can do pre hooks and post hooks after saving the data as schema
 
-usersSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) return next();
+usersSchema.pre('save', async function () {
+  if (!this.isModified('password')) return ;
   this.password = await bcrypt.hash(this.password, 10);
-  next();
+
   //now the problem here is whenever we are changing any field , this pre hook of hashing the password would run everytime, we need to put if conidition to check if only password is modified
 });
 
