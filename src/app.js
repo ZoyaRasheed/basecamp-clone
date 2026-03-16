@@ -3,6 +3,7 @@ import 'dotenv/config'
 import cors from 'cors'
 import healthCheckRouter from "./routes/healthcheck.routes.js"
 import authRouter from "./routes/auth.routes.js"
+import cookieParser from 'cookie-parser'
 
 
 //app.js is entirely for express configuration and index.js would be the entry point of application
@@ -12,7 +13,7 @@ const app = express()
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 app.use(express.static("public"))// this is public viewable
-
+app.use(cookieParser())
 
 //CORS configurations
 app.use(cors({
